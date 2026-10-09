@@ -1,0 +1,199 @@
+name: Build ISKCON Nairobi APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the app files
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Create the Android project
+        run: |
+          set -e
+          P=android
+          PKG=org/iskconnairobi/app
+          mkdir -p $P/app/src/main/java/$PKG $P/app/src/main/assets \
+                   $P/app/src/main/res/drawable $P/app/src/main/res/mipmap-anydpi-v26 $P/app/src/main/res/values
+          cp index.html $P/app/src/main/assets/index.html
+
+          cat > $P/settings.gradle <<'EOF'
+          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+          dependencyResolutionManagement {
+            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+            repositories { google(); mavenCentral() }
+          }
+          rootProject.name = "ISKCONNairobi"
+          include ':app'
+          EOF
+
+          cat > $P/build.gradle <<'EOF'
+          plugins { id 'com.android.application' version '8.5.2' apply false }
+          EOF
+
+          cat > $P/gradle.properties <<'EOF'
+          android.useAndroidX=true
+          org.gradle.jvmargs=-Xmx2g
+          EOF
+
+          cat > $P/app/build.gradle <<'EOF'
+          plugins { id 'com.android.application' }
+          android {
+            namespace 'org.iskconnairobi.app'
+            compileSdk 34
+            defaultConfig {
+              applicationId "org.iskconnairobi.app"
+              minSdk 26
+              targetSdk 34
+              versionCode 1
+              versionName "1.0"
+            }
+            compileOptions {
+              sourceCompatibility JavaVersion.VERSION_17
+              targetCompatibility JavaVersion.VERSION_17
+            }
+          }
+          dependencies { implementation 'androidx.webkit:webkit:1.11.0' }
+          EOF
+
+          cat > $P/app/src/main/AndroidManifest.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <application
+                android:label="ISKCON Nairobi"
+                android:icon="@mipmap/ic_launcher"
+                android:roundIcon="@mipmap/ic_launcher"
+                android:theme="@android:style/Theme.Material.Light.NoActionBar"
+                android:supportsRtl="true">
+              <activity
+                  android:name=".MainActivity"
+                  android:exported="true"
+                  android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode">
+                <intent-filter>
+                  <action android:name="android.intent.action.MAIN" />
+                  <category android:name="android.intent.category.LAUNCHER" />
+                </intent-filter>
+              </activity>
+            </application>
+          </manifest>
+          EOF
+
+          cat > $P/app/src/main/res/values/colors.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources><color name="ic_bg">#0A3A4C</color></resources>
+          EOF
+
+          cat > $P/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+            <background android:drawable="@color/ic_bg" />
+            <foreground android:drawable="@drawable/ic_lotus" />
+          </adaptive-icon>
+          EOF
+
+          cat > $P/app/src/main/res/drawable/ic_lotus.xml <<'EOF'
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp" android:height="108dp"
+              android:viewportWidth="108" android:viewportHeight="108">
+            <group android:translateX="30" android:translateY="28" android:scaleX="1.2" android:scaleY="1.2">
+              <path android:fillColor="#E8962E" android:pathData="M20,4 C15,11 15,19 20,26 C25,19 25,11 20,4 Z" />
+              <path android:fillColor="#FFFFFF" android:pathData="M20,26 C13,25 7,20 5,14 C12,14 17,18 20,26 Z M20,26 C27,25 33,20 35,14 C28,14 23,18 20,26 Z" />
+              <path android:strokeColor="#7DBB8E" android:strokeWidth="2.5" android:strokeLineCap="round" android:pathData="M8,31 L32,31" />
+            </group>
+          </vector>
+          EOF
+
+          cat > $P/app/src/main/java/$PKG/MainActivity.java <<'EOF'
+          package org.iskconnairobi.app;
+
+          import android.app.Activity;
+          import android.content.Intent;
+          import android.net.Uri;
+          import android.os.Bundle;
+          import android.webkit.WebChromeClient;
+          import android.webkit.WebResourceRequest;
+          import android.webkit.WebResourceResponse;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          import androidx.webkit.WebViewAssetLoader;
+
+          public class MainActivity extends Activity {
+            private static final String HOST = "appassets.androidplatform.net";
+            private WebView web;
+
+            @Override
+            protected void onCreate(Bundle state) {
+              super.onCreate(state);
+              web = new WebView(this);
+              setContentView(web);
+
+              WebSettings s = web.getSettings();
+              s.setJavaScriptEnabled(true);
+              s.setDomStorageEnabled(true);   // keeps accounts, bookmarks, sign-in
+              s.setSupportMultipleWindows(false);
+
+              final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
+                  .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                  .build();
+
+              web.setWebChromeClient(new WebChromeClient());
+              web.setWebViewClient(new WebViewClient() {
+                @Override
+                public WebResourceResponse shouldInterceptRequest(WebView v, WebResourceRequest r) {
+                  return loader.shouldInterceptRequest(r.getUrl());
+                }
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
+                  Uri u = r.getUrl();
+                  if (HOST.equals(u.getHost())) return false;
+                  openExternal(u);   // YouTube and book links open in their own apps
+                  return true;
+                }
+              });
+
+              if (state != null) web.restoreState(state);
+              else web.loadUrl("https://" + HOST + "/assets/index.html");
+            }
+
+            private void openExternal(Uri u) {
+              try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception ignored) { }
+            }
+
+            @Override
+            protected void onSaveInstanceState(Bundle out) {
+              super.onSaveInstanceState(out);
+              web.saveState(out);
+            }
+
+            @Override
+            public void onBackPressed() {
+              if (web.canGoBack()) web.goBack(); else super.onBackPressed();
+            }
+          }
+          EOF
+
+      - name: Build the APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon
+
+      - name: Save the APK for download
+        uses: actions/upload-artifact@v4
+        with:
+          name: ISKCON-Nairobi-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
