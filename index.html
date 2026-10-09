@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ISKCON Nairobi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --peacock:#0E4D64; --peacock-2:#0A3A4C; --saffron:#E8962E; --saffron-soft:#FCEBD2;
+  --tulasi:#3E7B4F; --lotus:#F7E6EA; --bg:#FBF8F5; --surface:#FFFFFF; --ink:#1C2430;
+  --muted:#5D6875; --line:#E6DFD8; --danger:#B3261E;
+  --display:"Yatra One", "Mukta", Georgia, serif;
+  --body:"Mukta", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --peacock:#5FB3C9; --peacock-2:#0B2C38; --saffron:#F0A845; --saffron-soft:#3A2A14;
+    --tulasi:#7DBB8E; --lotus:#2A1E22; --bg:#11171C; --surface:#1A2229; --ink:#ECEFF1;
+    --muted:#9AA6B1; --line:#2B3640; --danger:#F2867D;
+  }
+}
+:root[data-theme="dark"]{
+  --peacock:#5FB3C9; --peacock-2:#0B2C38; --saffron:#F0A845; --saffron-soft:#3A2A14;
+  --tulasi:#7DBB8E; --lotus:#2A1E22; --bg:#11171C; --surface:#1A2229; --ink:#ECEFF1;
+  --muted:#9AA6B1; --line:#2B3640; --danger:#F2867D;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+img{max-width:100%}
+button,input{font:inherit;color:inherit}
+a{color:var(--peacock)}
+:focus-visible{outline:3px solid var(--saffron);outline-offset:2px;border-radius:6px}
+.hidden{display:none !important}
+
+/* ---------- Auth ---------- */
+.auth{min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+.auth-hero{background:var(--peacock-2);color:#fff;padding:48px 24px 72px;position:relative;overflow:hidden;text-align:center}
+.auth-hero h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,9vw,3.6rem);line-height:1.05;margin:12px 0 6px;color:#FFE3B8}
+.auth-hero p{margin:0;opacity:.85}
+.feather{width:84px;height:auto;display:block;margin:0 auto}
+.auth-card{background:var(--surface);margin:-44px auto 32px;width:min(440px,calc(100% - 32px));border-radius:22px;padding:28px 24px;border:1px solid var(--line);position:relative}
+.auth-card h2{font-family:var(--display);font-weight:400;font-size:1.6rem;margin:0 0 4px;color:var(--peacock)}
+.auth-card .sub{color:var(--muted);margin:0 0 20px}
+label{display:block;font-weight:600;font-size:.95rem;margin:14px 0 6px}
+input[type=text],input[type=email],input[type=password],input[type=tel],input[type=search]{
+  width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);font-size:1rem}
+input:focus{border-color:var(--peacock);outline:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;border-radius:999px;padding:13px 22px;font-weight:600;text-decoration:none}
+.btn-primary{background:var(--saffron);color:#1d1204;width:100%;margin-top:22px}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-ghost{background:transparent;color:var(--peacock);padding:8px 4px}
+.links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:.95rem}
+.msg{margin-top:14px;padding:10px 14px;border-radius:12px;font-size:.95rem}
+.msg.err{background:color-mix(in srgb,var(--danger) 12%,transparent);color:var(--danger)}
+.msg.ok{background:color-mix(in srgb,var(--tulasi) 15%,transparent);color:var(--tulasi)}
+.code-box{font-size:1.6rem;letter-spacing:.3em;font-weight:700;text-align:center;padding:10px;background:var(--saffron-soft);border-radius:12px;margin-top:10px}
+
+/* ---------- App shell ---------- */
+.app{max-width:760px;margin:0 auto;padding:0 16px 110px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 0 8px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:34px;height:34px}
+.brand b{font-family:var(--display);font-weight:400;font-size:1.35rem;color:var(--peacock)}
+.greet{font-family:var(--display);font-weight:400;font-size:clamp(1.8rem,6vw,2.4rem);margin:14px 0 2px;line-height:1.15}
+.muted{color:var(--muted)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+.tabbar-inner{display:grid;grid-template-columns:repeat(3,1fr);width:min(760px,100%)}
+/* ---------- Profile sidebar ---------- */
+.menu-btn{display:flex;align-items:center;gap:10px;background:none;border:0;cursor:pointer;padding:0}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--peacock);color:#fff;display:grid;place-items:center;font-weight:700;font-size:1rem;flex:0 0 auto}
+.sidebar{position:fixed;top:0;bottom:0;left:0;width:min(340px,86vw);background:var(--surface);border-right:1px solid var(--line);z-index:30;
+  overflow-y:auto;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-102%);transition:transform .25s ease;visibility:hidden}
+.sidebar.open{transform:none;visibility:visible}
+.scrim{position:fixed;inset:0;background:rgba(10,20,28,.45);z-index:25;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.open{opacity:1;pointer-events:auto}
+.side-head{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.side-toggle{display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:left;flex:1;min-width:0}
+.menu-btn .avatar{transition:box-shadow .2s}
+.menu-btn[aria-expanded="true"] .avatar{box-shadow:0 0 0 3px var(--saffron)}
+.side-head .avatar{width:52px;height:52px;font-size:1.3rem}
+.side-head .nm{font-family:var(--display);font-size:1.3rem;line-height:1.2;color:var(--peacock)}
+.close-btn{margin-left:auto;background:none;border:0;font-size:1.5rem;cursor:pointer;color:var(--muted);padding:4px 8px}
+@media (prefers-reduced-motion:reduce){.sidebar,.scrim{transition:none}}
+@media (min-width:960px){
+  .sidebar{width:320px}
+  .scrim{display:none}
+  #appShell .app,#appShell .tabbar{transition:padding-left .25s ease}
+  #appShell.side-open .app,#appShell.side-open .tabbar{padding-left:336px}
+  #appShell.side-open .app{max-width:calc(760px + 336px)}
+  .tabbar-inner{width:min(760px,100%)}
+}
+.tab{background:none;border:0;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.82rem;color:var(--muted);cursor:pointer}
+.tab svg{width:24px;height:24px}
+.tab[aria-selected="true"]{color:var(--peacock);font-weight:700}
+.tab[aria-selected="true"] svg{stroke:var(--saffron)}
+section.view{animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){section.view{animation:none}}
+h3.sec{font-family:var(--display);font-weight:400;font-size:1.35rem;margin:28px 0 10px;color:var(--peacock)}
+
+/* ---------- Schedule ---------- */
+.next{background:var(--peacock-2);color:#fff;border-radius:20px;padding:20px 22px;margin-top:16px}
+.next small{opacity:.8}
+.next .t{font-family:var(--display);font-size:2rem;color:#FFE3B8;line-height:1.1;margin:4px 0}
+.days{display:flex;gap:8px;overflow-x:auto;padding:4px 0 6px;margin-top:18px}
+.day{flex:0 0 auto;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer}
+.day[aria-pressed="true"]{background:var(--saffron);border-color:var(--saffron);color:#1d1204;font-weight:600}
+.timeline{list-style:none;margin:14px 0 0;padding:0 0 0 18px;border-left:2px solid var(--line)}
+.timeline li{position:relative;padding:10px 0 14px 14px}
+.timeline li::before{content:"";position:absolute;left:-25px;top:17px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--peacock)}
+.timeline li.now::before{background:var(--saffron);border-color:var(--saffron);box-shadow:0 0 0 5px color-mix(in srgb,var(--saffron) 25%,transparent)}
+.timeline li.past{opacity:.55}
+.timeline .time{font-weight:700;color:var(--peacock);font-variant-numeric:tabular-nums}
+.timeline .name{font-weight:600}
+.timeline .desc{color:var(--muted);font-size:.95rem}
+.special{display:inline-block;font-size:.78rem;background:var(--lotus);padding:1px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
+
+/* ---------- Live ---------- */
+.live-panel{border-radius:22px;overflow:hidden;border:1px solid var(--line);background:var(--surface);margin-top:16px}
+.live-art{aspect-ratio:16/9;background:radial-gradient(circle at 50% 60%,#1d6a83 0%,var(--peacock-2) 70%);display:grid;place-items:center;position:relative}
+.play{width:84px;height:84px;border-radius:50%;background:var(--saffron);display:grid;place-items:center;text-decoration:none}
+.play svg{width:34px;height:34px;margin-left:5px}
+.live-badge{position:absolute;top:14px;left:14px;background:#C62828;color:#fff;font-weight:700;font-size:.8rem;padding:3px 10px;border-radius:6px}
+.live-body{padding:18px 20px 22px}
+.live-body h4{margin:0 0 4px;font-size:1.15rem}
+.row-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn-outline{border:1.5px solid var(--peacock);color:var(--peacock);background:transparent}
+
+/* ---------- Books ---------- */
+.books{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:12px}
+.book{border:0;padding:0;background:none;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch}
+.cover{--gold:#E9C46A;aspect-ratio:3/4;border-radius:4px 12px 12px 4px;padding:20px 16px 18px 20px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;color:#FFF4DC;position:relative;overflow:hidden;
+  background:radial-gradient(120% 80% at 50% 38%,color-mix(in srgb,var(--c) 70%,#fff 12%) 0%,var(--c) 55%,color-mix(in srgb,var(--c) 70%,#000) 100%);
+  box-shadow:inset 7px 0 0 rgba(0,0,0,.22),inset 9px 0 0 rgba(255,255,255,.08),0 6px 16px -8px rgba(0,0,0,.45);transition:transform .2s ease,box-shadow .2s ease}
+.cover::before{content:"";position:absolute;inset:8px 8px 8px 14px;border:1.5px solid var(--gold);border-radius:3px 8px 8px 3px;pointer-events:none}
+.cover::after{content:"";position:absolute;inset:12px 12px 12px 18px;border:.5px solid color-mix(in srgb,var(--gold) 60%,transparent);border-radius:2px 6px 6px 2px;pointer-events:none}
+.book:hover .cover,.book:focus-visible .cover{transform:translateY(-3px);box-shadow:inset 7px 0 0 rgba(0,0,0,.22),inset 9px 0 0 rgba(255,255,255,.08),0 12px 22px -10px rgba(0,0,0,.5)}
+@media (prefers-reduced-motion:reduce){.cover{transition:none}}
+.cover .orn{width:50%;height:auto;opacity:.9;flex:0 0 auto}
+.cover .emb{width:42%;height:auto;flex:0 1 auto;min-height:0}
+.cover .ct{font-family:var(--display);font-size:.98rem;line-height:1.15;color:#FFE3B0;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.cover .ca{font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;opacity:.8;margin-top:6px;line-height:1.3}
+.book .bn{font-weight:600;margin-top:8px;font-size:.95rem;line-height:1.3}
+.continue{display:flex;gap:14px;align-items:center;background:var(--saffron-soft);border-radius:18px;padding:14px 16px;margin-top:16px;text-decoration:none;color:var(--ink)}
+.continue .mini{width:44px;height:58px;border-radius:3px 8px 8px 3px;background:var(--peacock);flex:0 0 auto}
+.chapters{list-style:none;padding:0;margin:10px 0 0}
+.chapters li{border-bottom:1px solid var(--line)}
+.chapters a{display:flex;gap:14px;align-items:baseline;padding:13px 4px;text-decoration:none;color:var(--ink)}
+.chapters .n{font-family:var(--display);color:var(--saffron);min-width:2ch;font-size:1.2rem}
+.chapters .mark{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--muted);padding:4px}
+.chapters .mark[aria-pressed="true"]{color:var(--saffron)}
+.note{font-size:.88rem;color:var(--muted);margin-top:16px}
+
+/* ---------- Profile ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-top:14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.btn-danger{background:transparent;border:1.5px solid var(--danger);color:var(--danger);width:100%;margin-top:12px}
+</style>
+</head>
+<body>
+
+<!-- ================= AUTH ================= -->
+<div id="auth" class="auth">
+  <header class="auth-hero">
+    <svg class="feather" viewBox="0 0 100 140" aria-hidden="true">
+      <path d="M50 138 C50 100 50 70 50 30" stroke="#E8C48A" stroke-width="2" fill="none"/>
+      <ellipse cx="50" cy="48" rx="34" ry="46" fill="#1E7F6E"/>
+      <ellipse cx="50" cy="44" rx="22" ry="30" fill="#2BA4A0"/>
+      <ellipse cx="50" cy="40" rx="14" ry="18" fill="#E8962E"/>
+      <ellipse cx="50" cy="38" rx="9" ry="11" fill="#1B3F8F"/>
+      <ellipse cx="50" cy="37" rx="4.5" ry="5.5" fill="#0B1A3D"/>
+    </svg>
+    <h1>Hare Kṛṣṇa</h1>
+    <p>ISKCON Nairobi temple app</p>
+  </header>
+
+  <main class="auth-card" id="authCard" aria-live="polite">
+    <!-- Login -->
+    <form id="loginForm" novalidate>
+      <h2>Sign in</h2>
+      <p class="sub">Welcome back to the temple.</p>
+      <label for="loginEmail">Email</label>
+      <input id="loginEmail" type="email" autocomplete="email" required>
+      <label for="loginPass">Password</label>
+      <input id="loginPass" type="password" autocomplete="current-password" required>
+      <button class="btn btn-primary" type="submit">Sign in</button>
+      <div class="links">
+        <button type="button" class="btn btn-ghost" data-go="register">Create an account</button>
+        <button type="button" class="btn btn-ghost" data-go="reset">Forgot password?</button>
+      </div>
+      <div class="msg hidden" id="loginMsg"></div>
+    </form>
+
+    <!-- Register -->
+    <form id="registerForm" class="hidden" novalidate>
+      <h2>Create an account</h2>
+      <p class="sub">Join the ISKCON Nairobi community.</p>
+      <label for="regName">Full name</label>
+      <input id="regName" type="text" autocomplete="name" required>
+      <label for="regEmail">Email</label>
+      <input id="regEmail" type="email" autocomplete="email" required>
+      <label for="regPhone">Phone (optional)</label>
+      <input id="regPhone" type="tel" autocomplete="tel" placeholder="+254 7XX XXX XXX">
+      <label for="regPass">Password</label>
+      <input id="regPass" type="password" autocomplete="new-password" minlength="6" required>
+      <label for="regPass2">Confirm password</label>
+      <input id="regPass2" type="password" autocomplete="new-password" required>
+      <button class="btn btn-primary" type="submit">Create account</button>
+      <div class="links"><button type="button" class="btn btn-ghost" data-go="login">I already have an account</button></div>
+      <div class="msg hidden" id="regMsg"></div>
+    </form>
+
+    <!-- Reset step 1 -->
+    <form id="resetForm" class="hidden" novalidate>
+      <h2>Reset password</h2>
+      <p class="sub">Enter the email you registered with and we'll send a reset code.</p>
+      <label for="resetEmail">Email</label>
+      <input id="resetEmail" type="email" autocomplete="email" required>
+      <button class="btn btn-primary" type="submit">Send reset code</button>
+      <div class="links"><button type="button" class="btn btn-ghost" data-go="login">Back to sign in</button></div>
+      <div class="msg hidden" id="resetMsg"></div>
+    </form>
+
+    <!-- Reset step 2 -->
+    <form id="reset2Form" class="hidden" novalidate>
+      <h2>Set a new password</h2>
+      <p class="sub">Prototype only: in the real app this code arrives by email.</p>
+      <div class="code-box" id="demoCode"></div>
+      <label for="resetCode">Reset code</label>
+      <input id="resetCode" type="text" inputmode="numeric" maxlength="6" required>
+      <label for="newPass">New password</label>
+      <input id="newPass" type="password" autocomplete="new-password" minlength="6" required>
+      <button class="btn btn-primary" type="submit">Save new password</button>
+      <div class="links"><button type="button" class="btn btn-ghost" data-go="login">Back to sign in</button></div>
+      <div class="msg hidden" id="reset2Msg"></div>
+    </form>
+  </main>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="appShell" class="hidden">
+  <div class="app">
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Open your profile" aria-controls="sidebar" aria-expanded="false">
+        <span class="avatar" id="topAvatar" aria-hidden="true"></span>
+      </button>
+      <div class="brand" style="margin-right:auto;margin-left:12px">
+        <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4c-5 7-5 15 0 22 5-7 5-15 0-22z" fill="var(--saffron)"/><path d="M20 26c-7-1-13-6-15-12 7 0 12 4 15 12zm0 0c7-1 13-6 15-12-7 0-12 4-15 12z" fill="var(--peacock)"/><path d="M8 30h24" stroke="var(--tulasi)" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <b>ISKCON Nairobi</b>
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <section class="view hidden" id="view-schedule">
+      <h2 class="greet" id="greet">Hare Kṛṣṇa</h2>
+      <div class="muted" id="today"></div>
+      <div class="next" id="nextBox"></div>
+      <div class="days" role="group" aria-label="Choose a day" id="days"></div>
+      <ol class="timeline" id="timeline"></ol>
+      <p class="note">Sample timings for the prototype. Temple management can update these.</p>
+    </section>
+
+    <!-- Live -->
+    <section class="view" id="view-live">
+      <h2 class="greet">Watch live</h2>
+      <div class="muted">Join the temple programs from wherever you are.</div>
+      <div class="live-panel">
+        <div class="live-art">
+          <span class="live-badge" id="liveBadge">LIVE</span>
+          <a class="play" id="playLink" target="_blank" rel="noopener" aria-label="Open the live stream on YouTube">
+            <svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z" fill="#1d1204"/></svg>
+          </a>
+        </div>
+        <div class="live-body">
+          <h4 id="liveTitle"></h4>
+          <div class="muted" id="liveSub"></div>
+          <div class="row-links">
+            <a class="btn btn-primary" style="width:auto;margin:0" id="liveBtn" target="_blank" rel="noopener">Open on YouTube</a>
+            <a class="btn btn-outline" id="channelBtn" target="_blank" rel="noopener">Past programs</a>
+          </div>
+        </div>
+      </div>
+      <h3 class="sec">Streamed programs</h3>
+      <ol class="timeline" id="liveList"></ol>
+    </section>
+
+    <!-- Books -->
+    <section class="view hidden" id="view-books">
+      <div id="booksHome">
+        <h2 class="greet">Śrīla Prabhupāda's books</h2>
+        <div class="muted">Read online at prabhupadabooks.com.</div>
+        <a class="continue hidden" id="continueBox" target="_blank" rel="noopener">
+          <span class="mini" aria-hidden="true"></span>
+          <span><b>Continue reading</b><br><span class="muted" id="continueText"></span></span>
+        </a>
+        <div class="books" id="bookGrid"></div>
+      </div>
+      <div id="bgView" class="hidden">
+        <button class="btn btn-ghost" id="backBooks">‹ All books</button>
+        <h2 class="greet">Bhagavad-gītā As It Is</h2>
+        <label for="chSearch" class="muted" style="font-weight:400">Find a chapter</label>
+        <input id="chSearch" type="search" placeholder="e.g. karma, devotional">
+        <ul class="chapters" id="chapters"></ul>
+      </div>
+      <p class="note">Book text opens on prabhupadabooks.com in a new tab. © Bhaktivedanta Book Trust.</p>
+    </section>
+
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+    <!-- Profile -->
+    <aside class="sidebar" id="sidebar" aria-label="Your profile">
+      <div class="side-head">
+        <button class="side-toggle" id="sideToggle" aria-label="Close profile">
+          <span class="avatar" id="sideAvatar" aria-hidden="true"></span>
+          <span><span class="nm" id="sideName" style="display:block"></span><span class="muted" style="font-size:.9rem">Your account</span></span>
+        </button>
+        <button class="close-btn" id="closeSide" aria-label="Close profile">✕</button>
+      </div>
+      <div class="card"><dl class="kv" id="profileKv"></dl></div>
+      <div class="card">
+        <b>Change password</b>
+        <form id="changeForm" novalidate>
+          <label for="curPass">Current password</label>
+          <input id="curPass" type="password" autocomplete="current-password">
+          <label for="chPass">New password</label>
+          <input id="chPass" type="password" autocomplete="new-password">
+          <button class="btn btn-primary" type="submit">Save new password</button>
+          <div class="msg hidden" id="changeMsg"></div>
+        </form>
+      </div>
+      <button class="btn btn-danger" id="logoutBtn">Sign out</button>
+    </aside>
+
+  <nav class="tabbar" aria-label="Main">
+    <div class="tabbar-inner" role="tablist">
+      <button class="tab" role="tab" data-view="live" aria-selected="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/></svg>Live</button>
+      <button class="tab" role="tab" data-view="books" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1z"/><path d="M12 6v14"/></svg>Books</button>
+      <button class="tab" role="tab" data-view="schedule" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Schedule</button>
+    </div>
+  </nav>
+</div>
+
+<script>
+/* ================= CONFIG (edit these) ================= */
+const CONFIG = {
+  // Replace with the temple's real YouTube channel / live URL
+  youtubeLive: "https://www.youtube.com/@iskcon_nairobi/streams",
+  youtubeChannel: "https://www.youtube.com/@iskcon_nairobi/streams",
+  timeZone: "Africa/Nairobi"
+};
+
+// Sample daily programme (24h, Nairobi time). live:true = streamed on YouTube
+const DAILY = [
+  {t:"04:30", n:"Maṅgala-ārati", d:"Morning worship and kīrtana", live:true},
+  {t:"05:15", n:"Tulasī-pūjā", d:"Worship of Tulasī Devī"},
+  {t:"05:30", n:"Japa meditation", d:"Chanting the Hare Kṛṣṇa mahā-mantra"},
+  {t:"07:15", n:"Darśana-ārati & Guru-pūjā", d:"Greeting the Deities", live:true},
+  {t:"07:45", n:"Śrīmad-Bhāgavatam class", d:"Daily verse and lecture", live:true},
+  {t:"08:45", n:"Breakfast prasādam", d:"Temple dining hall"},
+  {t:"12:30", n:"Rāja-bhoga ārati", d:"Midday offering"},
+  {t:"16:30", n:"Temple doors reopen", d:"Darśana for visitors"},
+  {t:"18:30", n:"Sandhyā-ārati", d:"Evening worship and kīrtana", live:true},
+  {t:"19:15", n:"Bhagavad-gītā class", d:"Evening discourse", live:true},
+  {t:"20:30", n:"Śayana-ārati", d:"Temple closes for the night"}
+];
+const SUNDAY_EXTRA = [
+  {t:"15:30", n:"Sunday kīrtana", d:"Congregational chanting", live:true, special:true},
+  {t:"16:15", n:"Sunday lecture", d:"Guest speaker", live:true, special:true},
+  {t:"17:30", n:"Sunday feast", d:"Free prasādam for all", special:true}
+];
+
+// Original decorative emblems (gold line art) for the book covers
+const ORN = `<svg class="orn" viewBox="0 0 80 10" aria-hidden="true"><path d="M2 5h28M50 5h28" stroke="#E9C46A" stroke-width="1"/><path d="M40 1l4 4-4 4-4-4z" fill="#E9C46A"/><circle cx="32" cy="5" r="1.4" fill="#E9C46A"/><circle cx="48" cy="5" r="1.4" fill="#E9C46A"/></svg>`;
+const EMBLEMS = {
+  lotus:`<path d="M32 14c-6 8-6 20 0 28 6-8 6-20 0-28z"/><path d="M32 42c-9-1-16-8-18-18 9 1 16 8 18 18zm0 0c9-1 16-8 18-18-9 1-16 8-18 18z"/><path d="M32 42c-11 2-20-2-24-9 9-2 18 2 24 9zm0 0c11 2 20-2 24-9-9-2-18 2-24 9z"/><path d="M14 50h36M20 54h24"/>`,
+  feather:`<path d="M32 60V22"/><path d="M32 8c-13 6-17 22-12 34 4 6 8 8 12 8s8-2 12-8c5-12 1-28-12-34z"/><ellipse cx="32" cy="28" rx="7" ry="9"/><ellipse cx="32" cy="27" rx="3" ry="4" fill="#E9C46A"/><path d="M22 18l-5-4M42 18l5-4M20 30l-6-1M44 30l6-1M22 41l-5 3M42 41l5 3"/>`,
+  conch:`<path d="M20 50c-6-10-4-26 8-34 8-5 18-4 22 3 3 6 0 12-6 14-5 1-9-2-8-6 1-3 4-4 6-2"/><path d="M20 50c8 4 20 4 28-2 4-3 5-8 3-12"/><path d="M20 50l-4 6M24 52l-2 6"/><path d="M28 30c3 6 8 10 15 12"/>`,
+  sun:`<circle cx="32" cy="32" r="10"/><circle cx="32" cy="32" r="5" fill="#E9C46A"/><path d="M32 8v8M32 48v8M8 32h8M48 32h8M15 15l6 6M43 43l6 6M49 15l-6 6M21 43l-6 6"/><path d="M24 11l2 6M40 11l-2 6M24 53l2-6M40 53l-2-6M11 24l6 2M53 24l-6 2M11 40l6-2M53 40l-6-2" stroke-width="1"/>`,
+  tulasi:`<path d="M32 58V12"/><path d="M32 18c-5-4-11-3-13 0 4 3 9 4 13 0zm0 0c5-4 11-3 13 0-4 3-9 4-13 0z"/><path d="M32 30c-6-5-13-4-16 0 5 4 11 5 16 0zm0 0c6-5 13-4 16 0-5 4-11 5-16 0z"/><path d="M32 42c-7-5-15-4-18 0 6 4 12 5 18 0zm0 0c7-5 15-4 18 0-6 4-12 5-18 0z"/><circle cx="32" cy="10" r="2.5" fill="#E9C46A"/>`,
+  flute:`<path d="M10 52L52 12" stroke-width="5" stroke-linecap="round"/><path d="M10 52L52 12" stroke="#00000055" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="38.6" r="1.3" fill="#E9C46A"/><circle cx="29" cy="33.8" r="1.3" fill="#E9C46A"/><circle cx="34" cy="29" r="1.3" fill="#E9C46A"/><circle cx="39" cy="24.2" r="1.3" fill="#E9C46A"/><path d="M46 16c4 1 8 5 9 10M14 46c-1-4 1-8 4-10"/>`
+};
+const emblem = k => `<svg class="emb" viewBox="0 0 64 64" fill="none" stroke="#E9C46A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${EMBLEMS[k]}</svg>`;
+
+const BOOKS = [
+  {id:"bg", title:"Bhagavad-gītā As It Is", url:"https://prabhupadabooks.com/bg", color:"#0E4D64", emblem:"lotus", chapters:true},
+  {id:"sb", title:"Śrīmad-Bhāgavatam", url:"https://prabhupadabooks.com/sb", color:"#7A2E3B", emblem:"feather"},
+  {id:"cc", title:"Śrī Caitanya-caritāmṛta", url:"https://prabhupadabooks.com/cc", color:"#2F6B45", emblem:"conch"},
+  {id:"iso", title:"Śrī Īśopaniṣad", url:"https://prabhupadabooks.com/iso", color:"#A4561A", emblem:"sun"},
+  {id:"noi", title:"The Nectar of Instruction", url:"https://prabhupadabooks.com/noi", color:"#463A86", emblem:"tulasi"},
+  {id:"nod", title:"The Nectar of Devotion", url:"https://prabhupadabooks.com/nod", color:"#6E2F5E", emblem:"flute"}
+];
+const BG_CHAPTERS = [
+  "Observing the Armies on the Battlefield of Kurukṣetra","Contents of the Gītā Summarized","Karma-yoga",
+  "Transcendental Knowledge","Karma-yoga — Action in Kṛṣṇa Consciousness","Dhyāna-yoga",
+  "Knowledge of the Absolute","Attaining the Supreme","The Most Confidential Knowledge",
+  "The Opulence of the Absolute","The Universal Form","Devotional Service",
+  "Nature, the Enjoyer, and Consciousness","The Three Modes of Material Nature","The Yoga of the Supreme Person",
+  "The Divine and Demoniac Natures","The Divisions of Faith","Conclusion — The Perfection of Renunciation"
+];
+
+/* ================= Storage helpers (prototype) ================= */
+const store = {
+  get(k, fb){ try{ const v = localStorage.getItem("isk_"+k); return v ? JSON.parse(v) : fb; }catch(e){ return fb; } },
+  set(k, v){ try{ localStorage.setItem("isk_"+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem("isk_"+k); }catch(e){} }
+};
+let memUsers = null; // fallback if storage is unavailable
+function getUsers(){ return memUsers || store.get("users", {}); }
+function saveUsers(u){ memUsers = u; store.set("users", u); }
+
+async function hash(s){
+  try{
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+    return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+  }catch(e){ return "plain:"+s; }
+}
+const $ = id => document.getElementById(id);
+function showMsg(el, text, ok){ el.textContent = text; el.className = "msg " + (ok?"ok":"err"); }
+const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+
+/* ================= Auth flow ================= */
+const forms = {login:"loginForm", register:"registerForm", reset:"resetForm", reset2:"reset2Form"};
+function go(which){
+  Object.values(forms).forEach(f => $(f).classList.add("hidden"));
+  $(forms[which]).classList.remove("hidden");
+  document.querySelectorAll(".msg").forEach(m => m.classList.add("hidden"));
+  const first = $(forms[which]).querySelector("input"); if(first) first.focus();
+}
+document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
+
+$("registerForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name=$("regName").value.trim(), email=$("regEmail").value.trim().toLowerCase();
+  const phone=$("regPhone").value.trim(), p1=$("regPass").value, p2=$("regPass2").value, m=$("regMsg");
+  if(!name) return showMsg(m,"Enter your full name.");
+  if(!validEmail(email)) return showMsg(m,"Enter a valid email address.");
+  if(p1.length<6) return showMsg(m,"Use a password of at least 6 characters.");
+  if(p1!==p2) return showMsg(m,"The two passwords don't match.");
+  const users=getUsers();
+  if(users[email]) return showMsg(m,"An account with this email already exists. Sign in instead.");
+  users[email]={name,email,phone,pass:await hash(p1),joined:new Date().toISOString()};
+  saveUsers(users);
+  login(email);
+});
+
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const email=$("loginEmail").value.trim().toLowerCase(), pass=$("loginPass").value, m=$("loginMsg");
+  const u=getUsers()[email];
+  if(!u) return showMsg(m,"No account found for this email. Create an account first.");
+  if(u.pass!==await hash(pass)) return showMsg(m,"Incorrect password. Try again or reset it.");
+  login(email);
+});
+
+let pendingReset=null;
+$("resetForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const email=$("resetEmail").value.trim().toLowerCase(), m=$("resetMsg");
+  if(!getUsers()[email]) return showMsg(m,"No account found for this email.");
+  pendingReset={email, code:String(Math.floor(100000+Math.random()*900000)), exp:Date.now()+10*60*1000};
+  $("demoCode").textContent=pendingReset.code;
+  go("reset2");
+});
+$("reset2Form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const m=$("reset2Msg"), code=$("resetCode").value.trim(), np=$("newPass").value;
+  if(!pendingReset || Date.now()>pendingReset.exp) return showMsg(m,"This code has expired. Request a new one.");
+  if(code!==pendingReset.code) return showMsg(m,"That code doesn't match.");
+  if(np.length<6) return showMsg(m,"Use a password of at least 6 characters.");
+  const users=getUsers(); users[pendingReset.email].pass=await hash(np); saveUsers(users);
+  pendingReset=null;
+  go("login"); showMsg($("loginMsg"),"Password updated. Sign in with your new password.",true);
+});
+
+/* ================= Session ================= */
+let current=null;
+function login(email){
+  current=getUsers()[email]; store.set("session",email);
+  $("auth").classList.add("hidden"); $("appShell").classList.remove("hidden");
+  renderAll(); switchView("live");
+}
+function logout(){
+  store.del("session"); current=null;
+  $("appShell").classList.add("hidden"); $("auth").classList.remove("hidden");
+  document.querySelectorAll("form").forEach(f=>f.reset()); go("login");
+}
+$("logoutBtn").addEventListener("click", ()=>{ closeSidebar(); logout(); });
+const wide = window.matchMedia("(min-width:960px)");
+const isOpen = () => $("sidebar").classList.contains("open");
+function setSidebar(open){
+  $("sidebar").classList.toggle("open",open); $("scrim").classList.toggle("open",open);
+  $("appShell").classList.toggle("side-open",open);
+  $("menuBtn").setAttribute("aria-expanded",String(open));
+  $("menuBtn").setAttribute("aria-label",open?"Close your profile":"Open your profile");
+}
+function openSidebar(){ setSidebar(true); $("sideToggle").focus(); }
+function closeSidebar(){ if(!isOpen()) return; setSidebar(false); $("menuBtn").focus(); }
+function toggleSidebar(){ isOpen() ? closeSidebar() : openSidebar(); }
+$("menuBtn").addEventListener("click", toggleSidebar);
+$("sideToggle").addEventListener("click", closeSidebar);
+$("closeSide").addEventListener("click", closeSidebar);
+$("scrim").addEventListener("click", closeSidebar);
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeSidebar(); });
+
+$("changeForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const m=$("changeMsg"), users=getUsers(), u=users[current.email];
+  if(u.pass!==await hash($("curPass").value)) return showMsg(m,"Current password is incorrect.");
+  if($("chPass").value.length<6) return showMsg(m,"Use a password of at least 6 characters.");
+  u.pass=await hash($("chPass").value); saveUsers(users); current=u;
+  e.target.reset(); showMsg(m,"Password saved.",true);
+});
+
+/* ================= Navigation ================= */
+function switchView(v){
+  document.querySelectorAll("section.view").forEach(s=>s.classList.add("hidden"));
+  $("view-"+v).classList.remove("hidden");
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected", t.dataset.view===v));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>switchView(t.dataset.view)));
+
+/* ================= Time (Nairobi) ================= */
+function nairobiNow(){
+  const p=Object.fromEntries(new Intl.DateTimeFormat("en-GB",{timeZone:CONFIG.timeZone,weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false})
+    .formatToParts(new Date()).map(x=>[x.type,x.value]));
+  const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  return {dow:days.indexOf(p.weekday), mins:(+p.hour%24)*60+(+p.minute)};
+}
+const toMins = t => { const [h,m]=t.split(":").map(Number); return h*60+m; };
+const fmt = t => { const [h,m]=t.split(":").map(Number); const ap=h<12?"am":"pm"; return `${((h+11)%12)+1}:${String(m).padStart(2,"0")} ${ap}`; };
+function programFor(dow){ return dow===0 ? [...DAILY,...SUNDAY_EXTRA].sort((a,b)=>toMins(a.t)-toMins(b.t)) : DAILY; }
+
+/* ================= Schedule ================= */
+let selectedDay=null;
+function renderSchedule(){
+  const now=nairobiNow(); if(selectedDay===null) selectedDay=now.dow;
+  const h=Math.floor(now.mins/60);
+  const first=(current.name||"").split(" ")[0];
+  $("greet").textContent=`Hare Kṛṣṇa, ${first}`;
+  $("today").textContent=new Intl.DateTimeFormat("en-GB",{timeZone:CONFIG.timeZone,weekday:"long",day:"numeric",month:"long"}).format(new Date())+" · Nairobi time";
+
+  const today=programFor(now.dow);
+  const nxt=today.find(p=>toMins(p.t)>now.mins);
+  $("nextBox").innerHTML = nxt
+    ? `<small>Next at the temple</small><div class="t">${nxt.n}</div><div>${fmt(nxt.t)} — ${nxt.d}</div>`
+    : `<small>Today's programmes are complete</small><div class="t">Maṅgala-ārati</div><div>Tomorrow at ${fmt(DAILY[0].t)}</div>`;
+
+  const names=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  $("days").innerHTML="";
+  for(let i=0;i<7;i++){
+    const d=(now.dow+i)%7, b=document.createElement("button");
+    b.className="day"; b.textContent=i===0?"Today":names[d]+(d===0?" · Feast":"");
+    b.setAttribute("aria-pressed", d===selectedDay);
+    b.onclick=()=>{selectedDay=d; renderSchedule();};
+    $("days").appendChild(b);
+  }
+  const list=programFor(selectedDay), isToday=selectedDay===now.dow;
+  const curIdx=isToday ? list.reduce((acc,p,i)=>toMins(p.t)<=now.mins?i:acc,-1) : -1;
+  $("timeline").innerHTML=list.map((p,i)=>`
+    <li class="${isToday&&i<curIdx?"past":""} ${i===curIdx?"now":""}">
+      <div class="time">${fmt(p.t)}</div>
+      <div class="name">${p.n}${p.special?'<span class="special">Sunday</span>':""}</div>
+      <div class="desc">${p.d}</div>
+    </li>`).join("");
+}
+
+/* ================= Live ================= */
+function renderLive(){
+  const now=nairobiNow(), list=programFor(now.dow).filter(p=>p.live);
+  const on=list.find(p=>now.mins>=toMins(p.t) && now.mins<toMins(p.t)+45);
+  const nxt=list.find(p=>toMins(p.t)>now.mins);
+  $("liveBadge").classList.toggle("hidden",!on);
+  $("liveTitle").textContent = on ? `${on.n} is streaming now` : (nxt ? `Next stream: ${nxt.n}` : "No more streams today");
+  $("liveSub").textContent = on ? "Tap play to join on YouTube." : (nxt ? `Starts at ${fmt(nxt.t)} Nairobi time.` : `Tomorrow's first stream starts at ${fmt(DAILY[0].t)}.`);
+  ["playLink","liveBtn"].forEach(id=>$(id).href=CONFIG.youtubeLive);
+  $("channelBtn").href=CONFIG.youtubeChannel;
+  $("liveList").innerHTML=list.map(p=>`<li class="${on===p?"now":""}"><div class="time">${fmt(p.t)}</div><div class="name">${p.n}</div><div class="desc">${p.d}</div></li>`).join("");
+}
+
+/* ================= Books ================= */
+function renderBooks(){
+  $("bookGrid").innerHTML=BOOKS.map(b=>`
+    <button class="book" data-id="${b.id}" aria-label="Open ${b.title}">
+      <div class="cover" style="--c:${b.color}">
+        ${ORN}${emblem(b.emblem)}
+        <div><div class="ct">${b.title}</div><div class="ca">A.C. Bhaktivedanta Swami Prabhupāda</div></div>
+      </div>
+      <div class="bn">${b.title}</div>
+    </button>`).join("");
+  document.querySelectorAll(".book").forEach(el=>el.onclick=()=>{
+    const b=BOOKS.find(x=>x.id===el.dataset.id);
+    if(b.chapters){ $("booksHome").classList.add("hidden"); $("bgView").classList.remove("hidden"); renderChapters(); }
+    else { saveProgress(b.title, b.url); window.open(b.url,"_blank","noopener"); }
+  });
+  const last=store.get("last_"+current.email,null);
+  $("continueBox").classList.toggle("hidden",!last);
+  if(last){ $("continueBox").href=last.url; $("continueText").textContent=last.label; }
+}
+function saveProgress(label,url){ store.set("last_"+current.email,{label,url}); renderBooks(); }
+function renderChapters(){
+  const q=$("chSearch").value.trim().toLowerCase();
+  const marks=store.get("marks_"+current.email,[]);
+  $("chapters").innerHTML=BG_CHAPTERS.map((c,i)=>({c,i:i+1}))
+    .filter(x=>!q||x.c.toLowerCase().includes(q)||String(x.i)===q)
+    .map(x=>`<li><a href="https://prabhupadabooks.com/bg/${x.i}" target="_blank" rel="noopener" data-ch="${x.i}">
+      <span class="n">${x.i}</span><span>${x.c}</span>
+      <button class="mark" data-mark="${x.i}" aria-pressed="${marks.includes(x.i)}" aria-label="Bookmark chapter ${x.i}">${marks.includes(x.i)?"★":"☆"}</button></a></li>`).join("")
+    || `<li class="muted" style="padding:14px 4px">No chapter matches “${q}”. Try another word.</li>`;
+  document.querySelectorAll("[data-ch]").forEach(a=>a.addEventListener("click",ev=>{
+    if(ev.target.closest(".mark")) return;
+    saveProgress(`Bhagavad-gītā, Chapter ${a.dataset.ch}`, a.href);
+  }));
+  document.querySelectorAll("[data-mark]").forEach(b=>b.addEventListener("click",ev=>{
+    ev.preventDefault(); ev.stopPropagation();
+    const n=+b.dataset.mark; let m=store.get("marks_"+current.email,[]);
+    m=m.includes(n)?m.filter(x=>x!==n):[...m,n]; store.set("marks_"+current.email,m); renderChapters();
+  }));
+}
+$("chSearch").addEventListener("input",renderChapters);
+$("backBooks").onclick=()=>{ $("bgView").classList.add("hidden"); $("booksHome").classList.remove("hidden"); };
+
+/* ================= Profile ================= */
+function renderProfile(){
+  const ini=(current.name||"?").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+  $("topAvatar").textContent=ini; $("sideAvatar").textContent=ini; $("sideName").textContent=current.name;
+  $("profileKv").innerHTML=`<dt>Name</dt><dd>${esc(current.name)}</dd><dt>Email</dt><dd>${esc(current.email)}</dd>
+    <dt>Phone</dt><dd>${esc(current.phone||"—")}</dd><dt>Member since</dt><dd>${new Date(current.joined).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}</dd>`;
+}
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function renderAll(){ renderSchedule(); renderLive(); renderBooks(); renderProfile(); }
+setInterval(()=>{ if(current){ renderSchedule(); renderLive(); } },60000);
+
+/* ================= Boot ================= */
+const sess=store.get("session",null);
+if(sess && getUsers()[sess]) login(sess); else go("login");
+</script>
+</body>
+</html>
